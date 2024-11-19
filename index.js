@@ -1,33 +1,27 @@
-require('colors');
-const Config = require('./src/config');
-const Bot = require('./src/bot');
-const initLogger = require('./src/logger');
-const {
-  readLines,
-  displayHeader,
-  askAccountType,
-  askProxyMode,
-} = require('./src/utils');
+require("colors");
+const Config = require("./src/config");
+const Bot = require("./src/bot");
+const initLogger = require("./src/logger");
+const { readLines } = require("./src/utils");
 
 async function main() {
-  displayHeader();
-  console.log('⏳ Please wait...\n'.yellow);
+  console.log("⏳ Please wait...\n".yellow);
 
   const config = new Config();
   const logger = initLogger();
 
-  const tokens = await readLines('token.txt');
-  const useProxy = await askProxyMode();
+  const tokens = await readLines("token.txt");
+  const useProxy = true;
 
   let proxies = [];
   if (useProxy) {
-    proxies = await readLines('proxy.txt').then((lines) =>
+    proxies = await readLines("proxy.txt").then((lines) =>
       lines
         .map((line) => {
-          const [host, port, username, password] = line.split(':');
+          const [host, port, username, password] = line.split(":");
           if (!host || !port) {
             console.log(
-              `⚠️  ${'Invalid proxy format in'.red} proxy.txt`.yellow
+              `⚠️  ${"Invalid proxy format in".red} proxy.txt`.yellow
             );
             return null;
           }
@@ -38,43 +32,45 @@ async function main() {
 
     if (tokens.length > proxies.length) {
       console.log(
-        `⚠️  ${'Not enough proxies for the number of tokens'.yellow}`
+        `⚠️  ${"Not enough proxies for the number of tokens".yellow}`
       );
       return;
     }
   }
 
-  const accountType = await askAccountType();
   const bot = new Bot(config, logger);
 
-  if (accountType === 'Single Account') {
-    const singleToken = tokens[0];
+  const singleToken = tokens[0];
 
-    if (useProxy) {
-      for (const proxy of proxies) {
-        bot
-          .connect(singleToken, proxy)
-          .catch((err) => console.log(`❌ ${err.message}`.red));
-      }
-    } else {
+  if (useProxy) {
+    for (const proxy of proxies) {
       bot
-        .connect(singleToken)
+        .connect(singleToken, proxy)
         .catch((err) => console.log(`❌ ${err.message}`.red));
     }
   } else {
-    for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i];
-      const proxy = useProxy ? proxies[i] : null;
-      bot
-        .connect(token, proxy)
-        .catch((err) => console.log(`❌ ${err.message}`.red));
-    }
+    bot
+      .connect(singleToken)
+      .catch((err) => console.log(`❌ ${err.message}`.red));
   }
 
-  process.on('SIGINT', () => {
-    console.log(`\n👋 ${'Shutting down...'.green}`);
+  process.on("SIGINT", () => {
+    console.log(`\n👋 ${"Shutting down...".green}`);
     process.exit(0);
   });
 }
 
-main().catch((error) => console.log(`❌ ${error.message}`.red));
+function startHourlyProcess() {
+  async function restartProcess() {
+    await main().catch((error) => console.log(`❌ ${error.message}`.red));
+    console.log("\nProcess finished. Restarting in 1 hour...\n");
+
+    setTimeout(() => {
+      restartProcess();
+    }, 3600000);
+  }
+
+  restartProcess();
+}
+
+startHourlyProcess();

@@ -1,6 +1,6 @@
-const fs = require('fs');
-const readline = require('readline');
-const inquirer = require('inquirer');
+const fs = require("fs");
+const readline = require("readline");
+const inquirer = require("inquirer");
 
 async function readLines(filename) {
   const fileStream = fs.createReadStream(filename);
@@ -14,43 +14,13 @@ async function readLines(filename) {
 }
 
 function displayHeader() {
-  process.stdout.write('\x1Bc');
-  console.log('========================================'.cyan);
-  console.log('=          Nodepay Airdrop Bot         ='.cyan);
-  console.log('=     Created by HappyCuanAirdrop      ='.cyan);
-  console.log('=    https://t.me/HappyCuanAirdrop     ='.cyan);
-  console.log('========================================'.cyan);
+  process.stdout.write("\x1Bc");
+  console.log("========================================".cyan);
+  console.log("=          Nodepay Airdrop Bot         =".cyan);
+  console.log("=     Created by HappyCuanAirdrop      =".cyan);
+  console.log("=    https://t.me/HappyCuanAirdrop     =".cyan);
+  console.log("========================================".cyan);
   console.log();
 }
 
-async function askAccountType() {
-  const answers = await inquirer.prompt([
-    {
-      type: 'list',
-      name: 'accountType',
-      message: 'How many accounts would you like to use?',
-      choices: ['Single Account', 'Multiple Accounts'],
-    },
-  ]);
-
-  console.log('');
-
-  return answers.accountType;
-}
-
-async function askProxyMode() {
-  const answers = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'useProxy',
-      message: 'Would you like to use proxies?',
-      default: true,
-    },
-  ]);
-
-  console.log('');
-
-  return answers.useProxy;
-}
-
-module.exports = { readLines, displayHeader, askAccountType, askProxyMode };
+module.exports = { readLines, displayHeader };
