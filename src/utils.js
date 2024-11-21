@@ -13,4 +13,4 @@ async function readLines(filename) {
   return lines;
 }
 
-module.exports = { readLines, displayHeader };
+module.exports = { readLines };
