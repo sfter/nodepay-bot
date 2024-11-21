@@ -11,7 +11,7 @@ async function main() {
   const logger = initLogger();
 
   const tokens = await readLines("token.txt");
-  const useProxy = true;
+  const useProxy = false;
 
   let proxies = [];
   if (useProxy) {
@@ -49,9 +49,11 @@ async function main() {
         .catch((err) => console.log(`❌ ${err.message}`.red));
     }
   } else {
-    bot
-      .connect(singleToken)
-      .catch((err) => console.log(`❌ ${err.message}`.red));
+    for (let i = 0; i < tokens.length; i++) {
+		bot
+		  .connect(tokens[i])
+		  .catch((err) => console.log(`❌ ${err.message}`.red));
+	}
   }
 
   process.on("SIGINT", () => {
